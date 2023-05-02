@@ -8,6 +8,7 @@ using Windows.Media.Audio;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Media.Render;
+using WinRT;
 
 namespace Drastic.AudioRecorder;
 
@@ -222,7 +223,7 @@ public class AudioStream : IAudioStream
             using (IMemoryBufferReference reference = buffer.CreateReference())
             {
                 // Get the buffer from the AudioFrame
-                ((IMemoryBufferByteAccess)reference).GetBuffer(out byte* dataInBytes, out uint capacityInBytes);
+                reference.As<IMemoryBufferByteAccess>().GetBuffer(out byte* dataInBytes, out uint capacityInBytes);
 
                 // convert the bytes into float
                 float* dataInFloat = (float*)dataInBytes;
