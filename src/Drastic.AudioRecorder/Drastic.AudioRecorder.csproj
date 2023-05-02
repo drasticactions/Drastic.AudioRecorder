@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../MultiTargeting.targets" />
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0-android;net6.0-ios;net6.0-maccatalyst;net6.0-windows10.0.19041.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsPackable>true</IsPackable>
+    <Description>A Cross-Platform Audio Recorder plugin for .NET Apps.</Description>
+    <PackageTags>ios android maccatalyst audio recorder</PackageTags>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>
