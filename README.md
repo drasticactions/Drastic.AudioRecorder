@@ -1,6 +1,7 @@
 # Drastic.AudioRecorder
 
-Drastic.AudioRecorder is a fork of Plugin.AudioRecorder, for .NET Platforms.
+Drastic.AudioRecorder is a fork of [Plugin.AudioRecorder](https://github.com/NateRickard/Plugin.AudioRecorder), for .NET Platforms.
+It has the same API as Plugin.AudioRecorder, apart from the namespace.
 
 Features:
 
@@ -13,7 +14,7 @@ Features:
 # Setup
 
 - Available on NuGet: https://www.nuget.org/packages/Drastic.AudioRecorder
-- Install into your platform-specific projects, and any PCL/.NET Standard 2.0 projects required for your app.
+- Install into your platform-specific projects, and any .NET Standard 2.0 projects required for your app.
 
 ### Required Permissions & Capabilities
 
