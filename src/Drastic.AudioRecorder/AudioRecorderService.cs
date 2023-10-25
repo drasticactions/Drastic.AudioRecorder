@@ -22,6 +22,7 @@ public partial class AudioRecorderService
     private DateTime? silenceTime;
     private DateTime? startTime;
     private TaskCompletionSource<string> recordTask;
+    FileStream fileStream;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AudioRecorderService"/> class.
@@ -93,15 +94,28 @@ public partial class AudioRecorderService
     public float SilenceThreshold { get; set; } = .15f;
 
     /// <summary>
+    /// Gets/sets a value indicating if headers will be written to the file/stream.
+    /// </summary>
+    /// <remarks>Defaults to <c>true</c></remarks>
+    public bool WriteHeaders { get; set; } = true;
+
+    /// <summary>
     /// Starts recording audio.
     /// </summary>
+    /// <param name="recordStream"><c>null</c> (default) Optional stream to write audio data to, if null, a file will be created.</param>
     /// <returns>A <see cref="Task"/> that will complete when recording is finished.
     /// The task result will be the path to the recorded audio file, or null if no audio was recorded.</returns>
-    public async Task<Task<string>> StartRecording()
+    public async Task<Task<string>> StartRecording(Stream recordStream = null)
     {
-        if (this.FilePath == null)
+        if (recordStream == null)
         {
-            this.FilePath = await this.GetDefaultFilePath();
+            if (this.FilePath == null)
+            {
+                this.FilePath = await this.GetDefaultFilePath();
+            }
+
+            fileStream = new FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+            recordStream = fileStream;
         }
 
         this.ResetAudioDetection();
@@ -109,7 +123,7 @@ public partial class AudioRecorderService
 
         this.InitializeStream(this.PreferredSampleRate);
 
-        await this.recorder.StartRecorder(this.audioStream, this.FilePath);
+        await this.recorder.StartRecorder(this.audioStream, recordStream, WriteHeaders);
 
         this.AudioStreamDetails = new AudioStreamDetails
         {
@@ -134,7 +148,8 @@ public partial class AudioRecorderService
     /// <returns>A <see cref="Stream"/> object that can be used to read the audio file from the beginning.</returns>
     public Stream GetAudioFileStream()
     {
-        return this.recorder.GetAudioFileStream();
+        //return a new stream to the same audio file, in Read mode
+        return new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     /// <summary>
@@ -159,11 +174,12 @@ public partial class AudioRecorderService
             Debug.WriteLine("Error in StopRecording: {0}", ex);
         }
 
+        fileStream?.Dispose();
         this.OnRecordingStopped();
 
         var returnedFilePath = this.GetAudioFilePath();
 
-        // complete the recording Task for anthing waiting on this
+        // complete the recording Task for anything waiting on this
         this.recordTask.TrySetResult(returnedFilePath);
 
         if (continueProcessing)
